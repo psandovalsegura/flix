@@ -14,9 +14,12 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var networkLabel: UILabel!
+    @IBOutlet weak var searchButton: UIBarButtonItem!
+    @IBOutlet weak var movieSearchBar: UISearchBar!
     
     var movies: [NSDictionary]?
     var refreshControl = UIRefreshControl()
+    var endpoint: String!
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if let movies = movies {
@@ -51,18 +54,23 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         //By default, assume there is network connection
         networkLabel.hidden = true
         
+        //Do not display search bar - only displays when search button is clicked
+        movieSearchBar.hidden = true
+        
         tableView.dataSource = self
         tableView.delegate = self
         
         self.loadDataFromNetwork(true)
         refreshControl.addTarget(self, action: #selector(loadDataFromNetwork(_:)), forControlEvents: UIControlEvents.ValueChanged)
+        refreshControl.backgroundColor = UIColor.clearColor()
+        refreshControl.attributedTitle = NSAttributedString(string: "Last updated on \(NSDate())")
         tableView.insertSubview(refreshControl, atIndex: 0)
     }
     
     func loadDataFromNetwork(initial: Bool) {
         // Do any additional setup after loading the view.
         let apiKey = "996d1da2a3d7f707fd97b134f290c1ee"
-        let url = NSURL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")
+        let url = NSURL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")   //  \(endpoint)
         let request = NSURLRequest(
             URL: url!,
             cachePolicy: NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData,
@@ -105,6 +113,9 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         task.resume()
     }
     
+    @IBAction func searchButtonClicked(sender: AnyObject) {
+        movieSearchBar.hidden = false
+    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -115,14 +126,21 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     
     
-    /*
+    
      // MARK: - Navigation
      
      // In a storyboard-based application, you will often want to do a little preparation before navigation
      override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        let cell = sender as! UITableViewCell
+        let indexPath = tableView.indexPathForCell(cell)
+        let movie = movies![indexPath!.row]
+        
+        let destinationViewController = segue.destinationViewController as! DetailViewController
+        destinationViewController.movie = movie
+        
      // Get the new view controller using segue.destinationViewController.
      // Pass the selected object to the new view controller.
      }
-     */
+    
     
 }
