@@ -10,7 +10,7 @@ import UIKit
 import AFNetworking
 import MBProgressHUD
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var networkLabel: UILabel!
@@ -20,6 +20,9 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     var movies: [NSDictionary]?
     var refreshControl = UIRefreshControl()
     var endpoint: String!
+    
+    var titles = [String] ()
+    var filteredTitles = [String]()
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if let movies = movies {
@@ -44,7 +47,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         cell.posterView.setImageWithURL(imageUrl!)
         
-        print("row \(indexPath.row)")
         return cell
     }
     
@@ -67,10 +69,11 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         tableView.insertSubview(refreshControl, atIndex: 0)
     }
     
+    
     func loadDataFromNetwork(initial: Bool) {
         // Do any additional setup after loading the view.
         let apiKey = "996d1da2a3d7f707fd97b134f290c1ee"
-        let url = NSURL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)")   //  \(endpoint)
+        let url = NSURL(string: "https://api.themoviedb.org/3/movie/\(endpoint)?api_key=\(apiKey)")   //  \(endpoint)
         let request = NSURLRequest(
             URL: url!,
             cachePolicy: NSURLRequestCachePolicy.ReloadIgnoringLocalCacheData,
@@ -86,7 +89,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         
         if (initial) {
-        // Display HUD right before the request is made
+            // Display HUD right before the request is made
             MBProgressHUD.showHUDAddedTo(self.view, animated: true)
         }
         
@@ -94,11 +97,11 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             if let data = dataOrNil {
                 if let responseDictionary = try! NSJSONSerialization.JSONObjectWithData(
                     data, options:[]) as? NSDictionary {
-                    print("response: \(responseDictionary)")
                     
                     self.movies = responseDictionary["results"] as? [NSDictionary]
                     self.tableView.reloadData()
                 }
+                self.loadTitles()
             } else {
                 self.networkLabel.hidden = false
             }
@@ -113,9 +116,68 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         task.resume()
     }
     
-    @IBAction func searchButtonClicked(sender: AnyObject) {
-        movieSearchBar.hidden = false
+    func loadTitles() {
+        if let amountLoaded = movies?.count {
+            for index in 0 ..< amountLoaded {
+                let loadedMovie = movies![index]
+                let loadedTitle = loadedMovie["title"] as! String
+                //print(loadedTitle)
+                titles.append(loadedTitle)
+            }
+        }
     }
+    
+    @IBAction func searchButtonClicked(sender: AnyObject) {
+        if movieSearchBar.hidden {
+            movieSearchBar.hidden = false
+        } else {
+            movieSearchBar.hidden = true
+            movieSearchBar.text = ""
+        }
+    }
+    
+    func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
+        self.movieSearchBar.showsCancelButton = true
+    }
+    
+    func searchBarCancelButtonClicked(searchBar: UISearchBar) {
+        movieSearchBar.showsCancelButton = false
+        movieSearchBar.text = ""
+        movieSearchBar.resignFirstResponder()
+    }
+    
+    
+    
+    /*
+    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+        filteredData = searchText.isEmpty ? data : data.filter({(dataString: String) -> Bool in
+            return dataString.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil
+        })
+        
+    }
+    
+    
+    // This method updates filteredData based on the text in the Search Box
+    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+        // When there is no text, filteredData is the same as the original data
+        if searchText.isEmpty {
+            filteredData = data
+        } else {
+            // The user has entered text into the search box
+            // Use the filter method to iterate over all items in the data array
+            // For each item, return true if the item should be included and false if the
+            // item should NOT be included
+            filteredData = data.filter({(dataItem: String) -> Bool in
+                // If dataItem matches the searchText, return true to include it
+                if dataItem.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil {
+                    return true
+                } else {
+                    return false
+                }
+            })
+        }
+        tableView.reloadData()
+    }*/
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
