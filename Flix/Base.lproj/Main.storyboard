@@ -83,8 +83,8 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="movieSearchBar" destination="4xd-Hp-b00" id="V2k-l4-o9W"/>
                         <outlet property="networkLabel" destination="ybq-YP-DkT" id="kFC-ap-9Sk"/>
+                        <outlet property="searchBar" destination="4xd-Hp-b00" id="3OC-7d-hOb"/>
                         <outlet property="searchButton" destination="Sf8-SQ-Kza" id="ISw-Tg-zwl"/>
                         <outlet property="tableView" destination="y4p-xR-ZeY" id="ssD-dj-8FR"/>
                     </connections>
@@ -116,6 +116,7 @@
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Overview" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="TgL-0n-hec" userLabel="Overview">
                                                 <rect key="frame" x="8" y="-21" width="304" height="303"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                <color key="backgroundColor" red="0.60392156860000001" green="0.60392156860000001" blue="0.60392156860000001" alpha="1" colorSpace="calibratedRGB"/>
                                                 <fontDescription key="fontDescription" name="AppleSDGothicNeo-SemiBold" family="Apple SD Gothic Neo" pointSize="14"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 <nil key="highlightedColor"/>
@@ -133,6 +134,7 @@
                                 </subviews>
                             </scrollView>
                         </subviews>
+                        <color key="backgroundColor" red="0.60392156860000001" green="0.60392156860000001" blue="0.60392156860000001" alpha="1" colorSpace="calibratedRGB"/>
                     </view>
                     <navigationItem key="navigationItem" id="gcL-Me-Ky2"/>
                     <connections>

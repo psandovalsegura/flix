@@ -15,14 +15,33 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var networkLabel: UILabel!
     @IBOutlet weak var searchButton: UIBarButtonItem!
-    @IBOutlet weak var movieSearchBar: UISearchBar!
+    @IBOutlet weak var searchBar: UISearchBar!
     
     var movies: [NSDictionary]?
     var refreshControl = UIRefreshControl()
     var endpoint: String!
     
-    var titles = [String] ()
-    var filteredTitles = [String]()
+    var filteredData: [NSDictionary]!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        //By default, assume there is network connection
+        networkLabel.hidden = true
+        
+        //Do not display search bar - only displays when search button is clicked
+        searchBar.hidden = true
+        
+        tableView.dataSource = self
+        tableView.delegate = self
+        
+        self.loadDataFromNetwork(true)
+        refreshControl.addTarget(self, action: #selector(loadDataFromNetwork(_:)), forControlEvents: UIControlEvents.ValueChanged)
+        refreshControl.backgroundColor = UIColor.clearColor()
+        refreshControl.attributedTitle = NSAttributedString(string: "Last updated on \(NSDate())")
+        tableView.insertSubview(refreshControl, atIndex: 0)
+    }
+
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if let movies = movies {
@@ -38,7 +57,13 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         let title = movie["title"] as! String
         let overview = movie["overview"] as! String
         
-        cell.titleLabel.text = title
+        //Check if we are looking at the top rated movies
+        if self.endpoint == "top_rated" {
+            cell.titleLabel.text = "\(indexPath.row + 1). \(title)"
+        } else {
+            cell.titleLabel.text = title
+        }
+        
         cell.overviewLabel.text = overview
         
         let posterPath = movie["poster_path"] as! String
@@ -48,25 +73,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         cell.posterView.setImageWithURL(imageUrl!)
         
         return cell
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        //By default, assume there is network connection
-        networkLabel.hidden = true
-        
-        //Do not display search bar - only displays when search button is clicked
-        movieSearchBar.hidden = true
-        
-        tableView.dataSource = self
-        tableView.delegate = self
-        
-        self.loadDataFromNetwork(true)
-        refreshControl.addTarget(self, action: #selector(loadDataFromNetwork(_:)), forControlEvents: UIControlEvents.ValueChanged)
-        refreshControl.backgroundColor = UIColor.clearColor()
-        refreshControl.attributedTitle = NSAttributedString(string: "Last updated on \(NSDate())")
-        tableView.insertSubview(refreshControl, atIndex: 0)
     }
     
     
@@ -101,7 +107,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                     self.movies = responseDictionary["results"] as? [NSDictionary]
                     self.tableView.reloadData()
                 }
-                self.loadTitles()
             } else {
                 self.networkLabel.hidden = false
             }
@@ -116,6 +121,9 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         task.resume()
     }
     
+    
+    //Different approach for search: searching titles
+    /*
     func loadTitles() {
         if let amountLoaded = movies?.count {
             for index in 0 ..< amountLoaded {
@@ -126,25 +134,28 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             }
         }
     }
+    */
     
     @IBAction func searchButtonClicked(sender: AnyObject) {
-        if movieSearchBar.hidden {
-            movieSearchBar.hidden = false
+        if searchBar.hidden {
+            searchBar.hidden = false
         } else {
-            movieSearchBar.hidden = true
-            movieSearchBar.text = ""
+            searchBar.hidden = true
+            searchBar.text = ""
         }
     }
     
+    
+    /*
     func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
-        self.movieSearchBar.showsCancelButton = true
+        self.searchBar.showsCancelButton = true
     }
     
     func searchBarCancelButtonClicked(searchBar: UISearchBar) {
-        movieSearchBar.showsCancelButton = false
-        movieSearchBar.text = ""
-        movieSearchBar.resignFirstResponder()
-    }
+        searchBar.showsCancelButton = false
+        searchBar.text = ""
+        searchBar.resignFirstResponder()
+    }*/
     
     
     
@@ -183,9 +194,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
-    
-    
     
     
     
