@@ -2,7 +2,8 @@
 
 **Flix** is a movies app using the [The Movie Database API](http://docs.themoviedb.apiary.io/#).
 
-Time spent: **16** hours spent in total
+Submitted by: **Pedro Sandoval Segura**
+Time spent: **18** hours spent in total
 
 ## User Stories
 
@@ -28,10 +29,11 @@ The following **optional** features are implemented:
 The following **additional** features are implemented:
 
 - [x] Scroll view for smooth scrolling in detail view
-- [x] App icons in tab view with credit to Noun Project
+- [x] Icons in tab view with credit to Noun Project
 - [x] Tab bar views: now playing, top rated, upcoming
     - Top Rated category shows ranking with numbers
 - [x] Refreshing allows user to see the last time the app refreshed
+- [x] Nice homescreen App Icon
 
 
 Please list two areas of the assignment you'd like to **discuss further with your peers** during the next class (examples include better ways to implement something, how to extend your app in certain ways, etc):
@@ -43,7 +45,7 @@ Please list two areas of the assignment you'd like to **discuss further with you
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='https://i.imgur.com/AhLgeI6.mp4' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 

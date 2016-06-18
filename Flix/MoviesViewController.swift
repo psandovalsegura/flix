@@ -40,7 +40,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         refreshControl.addTarget(self, action: #selector(loadDataFromNetwork(_:)), forControlEvents: UIControlEvents.ValueChanged)
         refreshControl.backgroundColor = UIColor.grayColor()
         refreshControl.tintColor = UIColor.blackColor()
-        refreshControl.attributedTitle = NSAttributedString(string: "Last updated on \(NSDate())")
+        refreshControl.attributedTitle = NSAttributedString(string: "Last updated on \(getTimestamp())")
         tableView.insertSubview(refreshControl, atIndex: 0)
         loadDataFromNetwork(false)
     }
@@ -191,11 +191,12 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         // Dispose of any resources that can be recreated.
     }
     
-    /*func lastPullToRefresh(dateData: NSDate) -> String {
-        let currentDay = dateData.hou
-    }*/
-    
-    
+    /* Credit for this function to Scott Gardner on Stack Overflow: http://stackoverflow.com/questions/24070450/how-to-get-the-current-time-and-hour-as-datetime */
+    func getTimestamp() -> String{
+        let timestamp = NSDateFormatter.localizedStringFromDate(NSDate(), dateStyle: .MediumStyle, timeStyle: .ShortStyle)
+        return timestamp
+    }
+
      // MARK: - Navigation
      
      // In a storyboard-based application, you will often want to do a little preparation before navigation
