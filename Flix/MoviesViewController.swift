@@ -191,6 +191,9 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         // Dispose of any resources that can be recreated.
     }
     
+    /*func lastPullToRefresh(dateData: NSDate) -> String {
+        let currentDay = dateData.hou
+    }*/
     
     
      // MARK: - Navigation
