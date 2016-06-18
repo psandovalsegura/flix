@@ -21,7 +21,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     var refreshControl = UIRefreshControl()
     var endpoint: String!
     
-    var filteredData: [NSDictionary]!
+    var filteredMovies: [NSDictionary]!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,18 +34,21 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         tableView.dataSource = self
         tableView.delegate = self
+        searchBar.delegate = self
         
         self.loadDataFromNetwork(true)
         refreshControl.addTarget(self, action: #selector(loadDataFromNetwork(_:)), forControlEvents: UIControlEvents.ValueChanged)
-        refreshControl.backgroundColor = UIColor.clearColor()
+        refreshControl.backgroundColor = UIColor.grayColor()
+        refreshControl.tintColor = UIColor.blackColor()
         refreshControl.attributedTitle = NSAttributedString(string: "Last updated on \(NSDate())")
         tableView.insertSubview(refreshControl, atIndex: 0)
+        loadDataFromNetwork(false)
     }
 
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if let movies = movies {
-            return movies.count
+        if let currentMovies = filteredMovies {
+            return currentMovies.count
         } else {
             return 0
         }
@@ -53,7 +56,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("MovieCell", forIndexPath: indexPath) as! MovieCell
-        let movie = movies![indexPath.row]
+        
+        let movie = filteredMovies[indexPath.row]
         let title = movie["title"] as! String
         let overview = movie["overview"] as! String
         
@@ -106,6 +110,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                     
                     self.movies = responseDictionary["results"] as? [NSDictionary]
                     self.tableView.reloadData()
+                    self.filteredMovies = self.movies
                 }
             } else {
                 self.networkLabel.hidden = false
@@ -139,32 +144,12 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     @IBAction func searchButtonClicked(sender: AnyObject) {
         if searchBar.hidden {
             searchBar.hidden = false
+            tableView.frame.origin = CGPoint(x: 0, y: 40)
         } else {
             searchBar.hidden = true
+            tableView.frame.origin = CGPoint(x: 0, y: 0)
             searchBar.text = ""
         }
-    }
-    
-    
-    /*
-    func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
-        self.searchBar.showsCancelButton = true
-    }
-    
-    func searchBarCancelButtonClicked(searchBar: UISearchBar) {
-        searchBar.showsCancelButton = false
-        searchBar.text = ""
-        searchBar.resignFirstResponder()
-    }*/
-    
-    
-    
-    /*
-    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
-        filteredData = searchText.isEmpty ? data : data.filter({(dataString: String) -> Bool in
-            return dataString.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil
-        })
-        
     }
     
     
@@ -172,15 +157,15 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
         // When there is no text, filteredData is the same as the original data
         if searchText.isEmpty {
-            filteredData = data
+            filteredMovies = movies
         } else {
             // The user has entered text into the search box
             // Use the filter method to iterate over all items in the data array
             // For each item, return true if the item should be included and false if the
             // item should NOT be included
-            filteredData = data.filter({(dataItem: String) -> Bool in
+            filteredMovies = movies!.filter({(dataItem: NSDictionary) -> Bool in
                 // If dataItem matches the searchText, return true to include it
-                if dataItem.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil {
+                if String(dataItem["title"]).rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil {
                     return true
                 } else {
                     return false
@@ -188,7 +173,18 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             })
         }
         tableView.reloadData()
-    }*/
+    }
+    
+    func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
+        self.searchBar.showsCancelButton = true
+    }
+
+    func searchBarCancelButtonClicked(searchBar: UISearchBar) {
+        searchBar.showsCancelButton = false
+        searchBar.text = ""
+        searchBar.resignFirstResponder()
+    }
+
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -201,12 +197,34 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
      
      // In a storyboard-based application, you will often want to do a little preparation before navigation
      override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        //Check if user is searching
+        var movie: NSDictionary = NSDictionary() //Empty Dictionary
+        if searchBar.text != nil && searchBar.text != ""{
+            let movieTitle = (sender as! MovieCell).titleLabel.text
+            //print("User searched for \(movieTitle)")
+            for movieDictionary in movies! {
+                //print("In for loop... title retrieved is \(movieDictionary["title"]!)")
+                //print("Comparing \(String(movieDictionary["title"]!)) and \(String(movieTitle!))")
+                
+                if String(movieDictionary["title"]!) == String(movieTitle!) {
+                    //print("User search tap matched with \(movieDictionary["title"]). Dictionary save is below...")
+                    //print(movieDictionary)
+                    movie = movieDictionary
+                }
+            }
+        } else {
+            let cell = sender as! UITableViewCell
+            let indexPath = tableView.indexPathForCell(cell)
+            movie = movies![indexPath!.row]
+        }
+        /*
         let cell = sender as! UITableViewCell
         let indexPath = tableView.indexPathForCell(cell)
-        let movie = movies![indexPath!.row]
+        let movie = movies![indexPath!.row]*/
         
         let destinationViewController = segue.destinationViewController as! DetailViewController
         destinationViewController.movie = movie
+        //destinationViewController.viewDidLoad()
         
      // Get the new view controller using segue.destinationViewController.
      // Pass the selected object to the new view controller.

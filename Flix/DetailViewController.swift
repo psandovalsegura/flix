@@ -20,7 +20,10 @@ class DetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        scrollView.contentSize = CGSize(width: scrollView.frame.size.width, height: scrollView.frame.size.height + informationView.frame.size.height - 160)
+        scrollView.contentSize = CGSize(width: 320.0, height: 738.0) //CGSize(width: scrollView.frame.size.width, height: scrollView.frame.size.height + informationView.frame.size.height - 160)
+        
+        print("The scroll view's content size is \(scrollView.contentSize)") //debugging
+        print(movie) //debugging
         
         let title = movie["title"] as? String
         titleLabel.text = title
