@@ -36,13 +36,13 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         tableView.delegate = self
         searchBar.delegate = self
         
-        self.loadDataFromNetwork(true)
+        self.loadDataFromNetwork("initial")
         refreshControl.addTarget(self, action: #selector(loadDataFromNetwork(_:)), forControlEvents: UIControlEvents.ValueChanged)
-        refreshControl.backgroundColor = UIColor.grayColor()
+        refreshControl.backgroundColor = UIColor.clearColor()
         refreshControl.tintColor = UIColor.blackColor()
         refreshControl.attributedTitle = NSAttributedString(string: "Last updated on \(getTimestamp())")
         tableView.insertSubview(refreshControl, atIndex: 0)
-        loadDataFromNetwork(false)
+        loadDataFromNetwork("-")
     }
 
     
@@ -56,7 +56,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("MovieCell", forIndexPath: indexPath) as! MovieCell
-        
         let movie = filteredMovies[indexPath.row]
         let title = movie["title"] as! String
         let overview = movie["overview"] as! String
@@ -73,14 +72,13 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         let posterPath = movie["poster_path"] as! String
         let baseUrl = "http://image.tmdb.org/t/p/w500"
         let imageUrl = NSURL(string: baseUrl + posterPath)
-        
         cell.posterView.setImageWithURL(imageUrl!)
         
         return cell
     }
     
     
-    func loadDataFromNetwork(initial: Bool) {
+    func loadDataFromNetwork(point: AnyObject) {
         // Do any additional setup after loading the view.
         let apiKey = "996d1da2a3d7f707fd97b134f290c1ee"
         let url = NSURL(string: "https://api.themoviedb.org/3/movie/\(endpoint)?api_key=\(apiKey)")   //  \(endpoint)
@@ -97,9 +95,10 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             delegateQueue: NSOperationQueue.mainQueue()
         )
         
-        
-        if (initial) {
+        print(point)
+        if (String(point) == "initial") {
             // Display HUD right before the request is made
+            print("initial request to load")
             MBProgressHUD.showHUDAddedTo(self.view, animated: true)
         }
         
@@ -116,30 +115,15 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                 self.networkLabel.hidden = false
             }
             
-            if (initial) {
+            if (String(point) == "initial") {
                 // Hide HUD once the network request comes back (must be done on main UI thread)
                 MBProgressHUD.hideHUDForView(self.view, animated: true)
-            } else {
-                self.refreshControl.endRefreshing()
             }
+            
+            self.refreshControl.endRefreshing()
         })
         task.resume()
     }
-    
-    
-    //Different approach for search: searching titles
-    /*
-    func loadTitles() {
-        if let amountLoaded = movies?.count {
-            for index in 0 ..< amountLoaded {
-                let loadedMovie = movies![index]
-                let loadedTitle = loadedMovie["title"] as! String
-                //print(loadedTitle)
-                titles.append(loadedTitle)
-            }
-        }
-    }
-    */
     
     @IBAction func searchButtonClicked(sender: AnyObject) {
         if searchBar.hidden {
@@ -149,6 +133,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             searchBar.hidden = true
             tableView.frame.origin = CGPoint(x: 0, y: 0)
             searchBar.text = ""
+            loadDataFromNetwork("-")
+            tableView.reloadData()
         }
     }
     
@@ -182,7 +168,12 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     func searchBarCancelButtonClicked(searchBar: UISearchBar) {
         searchBar.showsCancelButton = false
         searchBar.text = ""
+        searchBar.hidden = true
+        tableView.frame.origin = CGPoint(x: 0, y: 0)
         searchBar.resignFirstResponder()
+        loadDataFromNetwork("-")
+        loadDataFromNetwork("-")
+        tableView.reloadData()
     }
 
     
@@ -221,6 +212,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             let indexPath = tableView.indexPathForCell(cell)
             movie = movies![indexPath!.row]
         }
+        
         /*
         let cell = sender as! UITableViewCell
         let indexPath = tableView.indexPathForCell(cell)
@@ -228,8 +220,6 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         let destinationViewController = segue.destinationViewController as! DetailViewController
         destinationViewController.movie = movie
-        //destinationViewController.viewDidLoad()
-        
      // Get the new view controller using segue.destinationViewController.
      // Pass the selected object to the new view controller.
      }

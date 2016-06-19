@@ -145,6 +145,7 @@
 				TargetAttributes = {
 					9BDA88331D11B39C0055486A = {
 						CreatedOnToolsVersion = 7.3.1;
+						DevelopmentTeam = 5HLDUZFLDY;
 					};
 				};
 			};
@@ -351,6 +352,7 @@
 			baseConfigurationReference = 4662CC086F8CB37E455836B2 /* Pods-Flix.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = Flix/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.sandoval.Flix;
@@ -364,6 +366,7 @@
 			baseConfigurationReference = C285F37FDD08BA149E4810F8 /* Pods-Flix.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = Flix/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.sandoval.Flix;
