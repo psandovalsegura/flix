@@ -39,8 +39,8 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         self.loadDataFromNetwork("initial")
         refreshControl.addTarget(self, action: #selector(loadDataFromNetwork(_:)), forControlEvents: UIControlEvents.ValueChanged)
         refreshControl.backgroundColor = UIColor.clearColor()
-        refreshControl.tintColor = UIColor.blackColor()
-        refreshControl.attributedTitle = NSAttributedString(string: "Last updated on \(getTimestamp())")
+        refreshControl.tintColor = UIColor.whiteColor()
+        refreshControl.attributedTitle = NSAttributedString(string: "Last updated on \(getTimestamp())", attributes: [NSForegroundColorAttributeName: UIColor.whiteColor()])
         tableView.insertSubview(refreshControl, atIndex: 0)
         loadDataFromNetwork("-")
     }
@@ -77,6 +77,16 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         return cell
     }
     
+    //Movie Cell deselection -  not handled by table view
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if let path = tableView.indexPathForSelectedRow {
+            
+            tableView.deselectRowAtIndexPath(path, animated: true)
+        }
+    }
+
     
     func loadDataFromNetwork(point: AnyObject) {
         // Do any additional setup after loading the view.
